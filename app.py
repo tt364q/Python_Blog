@@ -122,7 +122,21 @@ def logout():
     return redirect(url_for('login'))
 
 @app.route('/dashboard')
-def dashboard():        
+# @is_logged_in
+def dashboard():     
+    cur = mysql.connection.cursor()  
+
+    result = cur.execute("SELECT * FROM articles") 
+
+    articles = cur.fetchall()
+
+    if result > 0:
+        return render_template('dashboard.html', articles=articles)
+    else: 
+        msg = 'No Articles Found'
+        return render_template('dashboard.html', msg=msg)
+
+        cur.close()
     return render_template('dashboard.html')
 
 class ArticleForm(Form):
