@@ -2,11 +2,29 @@
 from flask import Flask, render_template, flash, redirect, url_for, session, request, logging
 from data import Articles
 # from flask_mysqldb import MySQL
+from flaskext.mysql import MySQL
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
 
 
+
 app = Flask(__name__)
+
+
+# config mysql
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = '123456'
+app.config['MYSQL_DB'] = 'myblogapp'
+app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+
+mysql = MySQL()
+mysql.init_app(app)
+
+
+
+
+
 
 
 Articles = Articles()
@@ -42,8 +60,24 @@ def register():
         username = form.username.data
         password = sha256_crypt.encrypt(str(form.password.data))
 
-        return render_template('register.html')
+        # create cursor
+        cur = mysql.connection.cursor()
+        # cur = mysql.get_db().cursor()
+        cur.execute("INSERT INTO users(name, email, username, password) VALUES(%s, %s, %s, %s)", (name, email, username, password))
+
+        # commit to DB
+        mysql.connection.commit()
+
+        # close connection
+        cur.close()
+
+        flash('You are now registered and can log in', 'success')
+
+        redirect(url_for('index'))
+        
+        # return render_template('register.html')
     return render_template('register.html', form=form)
 
 if __name__ == '__main__':
+    app.secret_key='secret123'
     app.run(debug=True)
