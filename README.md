@@ -10,6 +10,7 @@ A web app the lets you blog about your day!
 - Javascript
 - WTF Forms
 - Flask MySQL
+- Heroku
 
 ## Getting Started
 [Click Here](https://limitless-sea-19730.herokuapp.com/) to check out blogger.
